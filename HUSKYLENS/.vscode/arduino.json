@@ -1,0 +1,5 @@
+{
+    "board": "arduino:avr:leonardo",
+    "sketch": "examples/HUSKYLENS_MIND_PLUS/HUSKYLENS_MIND_PLUS.ino",
+    "port": "/dev/cu.usbmodem2301"
+}
