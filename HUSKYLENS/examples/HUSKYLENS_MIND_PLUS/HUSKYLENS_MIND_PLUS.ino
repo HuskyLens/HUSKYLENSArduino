@@ -1,7 +1,7 @@
-#include "HUKSYLENSMindPlus.h"
+#include "HUSKYLENSMindPlus.h"
 #include "SoftwareSerial.h"
 
-HUKSYLENSMindPlus huskylensMindPlus;
+HUSKYLENSMindPlus huskylensMindPlus;
 
 void setup() {
     Serial.begin(115200);

@@ -3,8 +3,8 @@
 #include "HuskyLensProtocolCore.h"
 #include "Arduino.h"
 
-#ifndef _HUKSYLENS_H
-#define _HUKSYLENS_H
+#ifndef _HUSKYLENS_H
+#define _HUSKYLENS_H
 
 
 ////////////////////////////////////////////////////////////////////////////
@@ -86,7 +86,7 @@ enum protocolAlgorithm{
 
 typedef Protocol_t HUSKYLENSResult;
 
-class HUKSYLENS
+class HUSKYLENS
 {
 private:
     TwoWire *wire;
@@ -220,9 +220,9 @@ public:
     class Blocks
     {
         private:
-            HUKSYLENS *entity;
+            HUSKYLENS *entity;
         public:
-            void init(HUKSYLENS *e){
+            void init(HUSKYLENS *e){
                 entity = e;
             }
 
@@ -244,9 +244,9 @@ public:
     class Arrows
     {
         private:
-            HUKSYLENS *entity;
+            HUSKYLENS *entity;
         public:
-            void init(HUKSYLENS *e){
+            void init(HUSKYLENS *e){
                 entity = e;
             }
             int available(){
@@ -264,7 +264,7 @@ public:
             }
     } arrows;
 
-    HUKSYLENS(/* args */)
+    HUSKYLENS(/* args */)
     {
         blocks.init(this);
         arrows.init(this);
@@ -278,7 +278,7 @@ public:
         resultDefault.fifth = -1;
     }
 
-    ~HUKSYLENS()
+    ~HUSKYLENS()
     {
     }
 

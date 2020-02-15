@@ -1,7 +1,7 @@
-#include "HUKSYLENS.h"
+#include "HUSKYLENS.h"
 #include "SoftwareSerial.h"
 
-HUKSYLENS huskylens;
+HUSKYLENS huskylens;
 SoftwareSerial mySerial(10, 11); // RX, TX
 //HUSKYLENS green line >> Pin 10; blue line >> Pin 11
 
@@ -11,7 +11,7 @@ void setup() {
     while (!huskylens.begin(mySerial))
     {
         Serial.println(F("Begin failed!"));
-        Serial.println(F("1.Please recheck the \"Protocol Type\" in HUKSYLENS (General Settings>>Protocol Type>>Serial 9600)"));
+        Serial.println(F("1.Please recheck the \"Protocol Type\" in HUSKYLENS (General Settings>>Protocol Type>>Serial 9600)"));
         Serial.println(F("2.Please recheck the connection."));
         delay(100);
     }
