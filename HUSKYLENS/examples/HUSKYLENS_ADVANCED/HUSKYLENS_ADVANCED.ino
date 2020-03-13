@@ -1,3 +1,24 @@
+/***************************************************
+ HUKSYLENS An Easy-to-use AI Machine Vision Sensor
+ <https://www.dfrobot.com/product-1922.html>
+ 
+ ***************************************************
+ This example shows the full function of library for HUSKYLENS via I2c.
+ 
+ Created 2020-03-13
+ By [Angelo qiao](Angelo.qiao@dfrobot.com)
+ 
+ GNU Lesser General Public License.
+ See <http://www.gnu.org/licenses/> for details.
+ All above must be included in any redistribution
+ ****************************************************/
+
+/***********Notice and Trouble shooting***************
+ 1.Connection and Diagram can be found here
+ <https://wiki.dfrobot.com/HUSKYLENS_V1.0_SKU_SEN0305_SEN0336#target_23>
+ 2.This code is tested on Arduino Uno, Leonardo, Mega boards.
+ ****************************************************/
+
 #include "HUKSYLENS.h"
 #include "SoftwareSerial.h"
 
@@ -7,6 +28,8 @@ int ID0 = 0; //not learned results. Grey result on HUSKYLENS screen
 int ID1 = 1; //first learned results. colored result on HUSKYLENS screen
 int ID2 = 2; //second learned results. colored result on HUSKYLENS screen
 // and so on.....
+
+void printResult(HUSKYLENSResult result);
 
 void setup() {
     Serial.begin(115200);
@@ -19,6 +42,7 @@ void setup() {
         delay(100);
     }
     
+    // Uncomment one of the following code to switch the algorithm on HUSKYLENS:
     // huskylens.writeAlgorithm(ALGORITHM_FACE_RECOGNITION);
     // huskylens.writeAlgorithm(ALGORITHM_OBJECT_TRACKING);
     // huskylens.writeAlgorithm(ALGORITHM_OBJECT_RECOGNITION);
@@ -28,148 +52,101 @@ void setup() {
 }
 
 void loop() {
-    if (huskylens.request())
-    // if (huskylens.requestBlocks())
-    // if (huskylens.requestArrows())
-    // if (huskylens.requestLearned())
-    // if (huskylens.requestBlocksLearned())
-    // if (huskylens.requestArrowsLearned())
-    // if (huskylens.request(ID1))
-    // if (huskylens.requestBlocks(ID1))
-    // if (huskylens.requestArrows(ID1))
+    if (huskylens.request())                    //request all blocks and arrows from HUSKYLENS
+    // if (huskylens.requestBlocks())           //request only blocks from HUSKYLENS
+    // if (huskylens.requestArrows())           //request only arrows from HUSKYLENS
+    // if (huskylens.requestLearned())          //request blocks and arrows tangged ID != 0 from HUSKYLENS
+    // if (huskylens.requestBlocksLearned())    //request blocks tangged ID != ID0 from HUSKYLENS
+    // if (huskylens.requestArrowsLearned())    //request arrows tangged ID != ID0 from HUSKYLENS
+    // if (huskylens.request(ID1))              //request blocks and arrows tangged ID == ID1 from HUSKYLENS
+    // if (huskylens.requestBlocks(ID1))        //request blocks tangged ID == ID1 from HUSKYLENS
+    // if (huskylens.requestArrows(ID1))        //request arrows tangged ID == ID1 from HUSKYLENS
+    // if (huskylens.request(ID2))              //request blocks and arrows tangged ID == ID2 from HUSKYLENS
+    // if (huskylens.requestBlocks(ID2))        //request blocks tangged ID == ID2 from HUSKYLENS
+    // if (huskylens.requestArrows(ID2))        //request arrows tangged ID == ID2 from HUSKYLENS
     {
         Serial.println("###################################");
-        Serial.println(String()+F("Number of learned IDs:")+huskylens.countLearnedIDs());
-        Serial.println(String()+F("frame number:")+huskylens.frameNumber());
+        Serial.println(String()+F("Count of learned IDs:")+huskylens.countLearnedIDs());//The count of (faces, colors, objects or lines) you have learned on HUSKYLENS.
+        Serial.println(String()+F("frame number:")+huskylens.frameNumber());//The number of frame HUSKYLENS have processed.
 
-        Serial.println(String()+F("Number of results:")+huskylens.available());
-        for (int i = 0; i < huskylens.available(); i++)
+        Serial.println("#######");
+        Serial.println(String()+F("Get all blocks and arrows. Count:")+huskylens.count());
+        for (int i = 0; i < huskylens.count(); i++)
         {
-            HUSKYLENSResult result = huskylens.readDirect(i);
-            if (result.command == COMMAND_RETURN_BLOCK)
-            {
-                Serial.println(String()+i+F(":Block:xCenter=")+result.xCenter+F(",yCenter=")+result.yCenter+F(",width=")+result.width+F(",height=")+result.height+F(",ID=")+result.ID);
-            }
-            else if (result.command == COMMAND_RETURN_ARROW)
-            {
-                Serial.println(String()+i+F(":Arrow:xOrigin=")+result.xOrigin+F(",yOrigin=")+result.yOrigin+F(",xTarget=")+result.xTarget+F(",yTarget=")+result.yTarget+F(",ID=")+result.ID);
-            }
-        }
-        Serial.println(String()+F("Number of Blocks:")+huskylens.blocks.available());
-        for (int i = 0; i < huskylens.blocks.available(); i++)
-        {
-            HUSKYLENSResult result = huskylens.blocks.readDirect(i);
-            Serial.println(String()+i+F(":Block:xCenter=")+result.xCenter+F(",yCenter=")+result.yCenter+F(",width=")+result.width+F(",height=")+result.height+F(",ID=")+result.ID);
-        }
-        Serial.println(String()+F("Number of Arrows:")+huskylens.arrows.available());
-        for (int i = 0; i < huskylens.arrows.available(); i++)
-        {
-            HUSKYLENSResult result = huskylens.arrows.readDirect(i);
-            Serial.println(String()+i+F(":Arrow:xOrigin=")+result.xOrigin+F(",yOrigin=")+result.yOrigin+F(",xTarget=")+result.xTarget+F(",yTarget=")+result.yTarget+F(",ID=")+result.ID);
+            HUSKYLENSResult result = huskylens.get(i);
+            printResult(result);
         }
 
-        Serial.println(String()+F("Number of results ID0:")+huskylens.available(ID0));
-        if (huskylens.available(ID0))
+        Serial.println("#######");
+        Serial.println(String()+F("Get all blocks. Count:")+huskylens.countBlocks());
+        for (int i = 0; i < huskylens.countBlocks(); i++)
         {
-            HUSKYLENSResult result = huskylens.read(ID0);
-            if (result.command == COMMAND_RETURN_BLOCK)
-            {
-                Serial.println(String()+0+F(":Block:xCenter=")+result.xCenter+F(",yCenter=")+result.yCenter+F(",width=")+result.width+F(",height=")+result.height);
-            }
-            else if (result.command == COMMAND_RETURN_ARROW)
-            {
-                Serial.println(String()+0+F(":Arrow:xOrigin=")+result.xOrigin+F(",yOrigin=")+result.yOrigin+F(",xTarget=")+result.xTarget+F(",yTarget=")+result.yTarget);
-            }
-        }
-        for (int i = 0; i < huskylens.available(ID0); i++)
-        {
-            HUSKYLENSResult result = huskylens.read(ID0, i);
-            if (result.command == COMMAND_RETURN_BLOCK)
-            {
-                Serial.println(String()+i+F(":Block:xCenter=")+result.xCenter+F(",yCenter=")+result.yCenter+F(",width=")+result.width+F(",height=")+result.height);
-            }
-            else if (result.command == COMMAND_RETURN_ARROW)
-            {
-                Serial.println(String()+i+F(":Arrow:xOrigin=")+result.xOrigin+F(",yOrigin=")+result.yOrigin+F(",xTarget=")+result.xTarget+F(",yTarget=")+result.yTarget);
-            }
+            HUSKYLENSResult result = huskylens.getBlock(i);
+            printResult(result);
         }
 
-        Serial.println(String()+F("Number of blocks ID0:")+huskylens.blocks.available(ID0));
-        if (huskylens.blocks.available(ID0))
+        Serial.println("#######");
+        Serial.println(String()+F("Get all arrows. Count:")+huskylens.countArrows());
+        for (int i = 0; i < huskylens.countArrows(); i++)
         {
-            HUSKYLENSResult result = huskylens.blocks.read(ID0);
-            Serial.println(String()+0+F(":Block:xCenter=")+result.xCenter+F(",yCenter=")+result.yCenter+F(",width=")+result.width+F(",height=")+result.height);
-        }
-        for (int i = 0; i < huskylens.blocks.available(ID0); i++)
-        {
-            HUSKYLENSResult result = huskylens.blocks.read(ID0, i);
-            Serial.println(String()+i+F(":Block:xCenter=")+result.xCenter+F(",yCenter=")+result.yCenter+F(",width=")+result.width+F(",height=")+result.height);
+            HUSKYLENSResult result = huskylens.getArrow(i);
+            printResult(result);
         }
 
-        Serial.println(String()+F("Number of arrows ID0:")+huskylens.arrows.available(ID0));
-        if (huskylens.arrows.available(ID0))
+        Serial.println("#######");
+        Serial.println(String()+F("Get all blocks and arrows tagged ID0. Count:")+huskylens.count(ID0));
+        for (int i = 0; i < huskylens.count(ID0); i++)
         {
-            HUSKYLENSResult result = huskylens.arrows.read(ID0);
-            Serial.println(String()+0+F(":Arrow:xOrigin=")+result.xOrigin+F(",yOrigin=")+result.yOrigin+F(",xTarget=")+result.xTarget+F(",yTarget=")+result.yTarget);
-        }
-        for (int i = 0; i < huskylens.arrows.available(ID0); i++)
-        {
-            HUSKYLENSResult result = huskylens.arrows.read(ID0, i);  
-            Serial.println(String()+F("Arrow:xOrigin=")+result.xOrigin+F(",yOrigin=")+result.yOrigin+F(",xTarget=")+result.xTarget+F(",yTarget=")+result.yTarget);
+            HUSKYLENSResult result = huskylens.get(ID0, i);
+            printResult(result);
         }
 
-        Serial.println(String()+F("Number of results ID1:")+huskylens.available(ID1));
-        if (huskylens.available(ID1))
+        Serial.println("#######");
+        Serial.println(String()+F("Get all blocks with learn ID equals ID0. Count:")+huskylens.countBlocks(ID0));
+        for (int i = 0; i < huskylens.countBlocks(ID0); i++)
         {
-            HUSKYLENSResult result = huskylens.read(ID1);
-            if (result.command == COMMAND_RETURN_BLOCK)
-            {
-                Serial.println(String()+0+F(":Block:xCenter=")+result.xCenter+F(",yCenter=")+result.yCenter+F(",width=")+result.width+F(",height=")+result.height);
-            }
-            else if (result.command == COMMAND_RETURN_ARROW)
-            {
-                Serial.println(String()+0+F(":Arrow:xOrigin=")+result.xOrigin+F(",yOrigin=")+result.yOrigin+F(",xTarget=")+result.xTarget+F(",yTarget=")+result.yTarget);
-            }
-        }
-        for (int i = 0; i < huskylens.available(ID1); i++)
-        {
-            HUSKYLENSResult result = huskylens.read(ID1, i);
-            if (result.command == COMMAND_RETURN_BLOCK)
-            {
-                Serial.println(String()+i+F(":Block:xCenter=")+result.xCenter+F(",yCenter=")+result.yCenter+F(",width=")+result.width+F(",height=")+result.height);
-            }
-            else if (result.command == COMMAND_RETURN_ARROW)
-            {
-                Serial.println(String()+i+F(":Arrow:xOrigin=")+result.xOrigin+F(",yOrigin=")+result.yOrigin+F(",xTarget=")+result.xTarget+F(",yTarget=")+result.yTarget);
-            }
+            HUSKYLENSResult result = huskylens.getBlock(ID0, i);
+            printResult(result);
         }
 
-        Serial.println(String()+F("Number of blocks ID1:")+huskylens.blocks.available(ID1));
-        if (huskylens.blocks.available(ID1))
+        Serial.println("#######");
+        Serial.println(String()+F("Get all arrows tagged ID0. Count:")+huskylens.countArrows(ID0));
+        for (int i = 0; i < huskylens.countArrows(ID0); i++)
         {
-            HUSKYLENSResult result = huskylens.blocks.read(ID1);
-            Serial.println(String()+0+F(":Block:xCenter=")+result.xCenter+F(",yCenter=")+result.yCenter+F(",width=")+result.width+F(",height=")+result.height);
-        }
-        for (int i = 0; i < huskylens.blocks.available(ID1); i++)
-        {
-            HUSKYLENSResult result = huskylens.blocks.read(ID1, i);
-            Serial.println(String()+i+F(":Block:xCenter=")+result.xCenter+F(",yCenter=")+result.yCenter+F(",width=")+result.width+F(",height=")+result.height);
+            HUSKYLENSResult result = huskylens.getArrow(ID0, i);  
+            printResult(result);
         }
 
-        Serial.println(String()+F("Number of arrows ID1:")+huskylens.arrows.available(ID1));
-        if (huskylens.arrows.available(ID1))
+        Serial.println("#######");
+        Serial.println(String()+F("Get all blocks and arrows tagged ID1. Count:")+huskylens.count(ID1));
+        for (int i = 0; i < huskylens.count(ID1); i++)
         {
-            HUSKYLENSResult result = huskylens.arrows.read(ID1);
-            Serial.println(String()+0+F(":Arrow:xOrigin=")+result.xOrigin+F(",yOrigin=")+result.yOrigin+F(",xTarget=")+result.xTarget+F(",yTarget=")+result.yTarget);
+            HUSKYLENSResult result = huskylens.get(ID1, i);
+            printResult(result);
         }
-        for (int i = 0; i < huskylens.arrows.available(ID1); i++)
+
+        Serial.println("#######");
+        Serial.println(String()+F("Get all blocks and arrows tagged ID2. Count:")+huskylens.count(ID2));
+        for (int i = 0; i < huskylens.count(ID2); i++)
         {
-            HUSKYLENSResult result = huskylens.arrows.read(ID1, i);  
-            Serial.println(String()+i+F(":Arrow:xOrigin=")+result.xOrigin+F(",yOrigin=")+result.yOrigin+F(",xTarget=")+result.xTarget+F(",yTarget=")+result.yTarget);
+            HUSKYLENSResult result = huskylens.get(ID2, i);
+            printResult(result);
         }
     }
     else
     {
         Serial.println("Fail to request objects from Huskylens!");
+    }
+}
+
+void printResult(HUSKYLENSResult result){
+    if (result.command == COMMAND_RETURN_BLOCK){//result is a block
+        Serial.println(String()+F("Block:xCenter=")+result.xCenter+F(",yCenter=")+result.yCenter+F(",width=")+result.width+F(",height=")+result.height+F(",ID=")+result.ID);
+    }
+    else if (result.command == COMMAND_RETURN_ARROW){//result is an arrow
+        Serial.println(String()+F("Arrow:xOrigin=")+result.xOrigin+F(",yOrigin=")+result.yOrigin+F(",xTarget=")+result.xTarget+F(",yTarget=")+result.yTarget+F(",ID=")+result.ID);
+    }
+    else{//result is unknown.
+        Serial.println("Object unknown!");
     }
 }

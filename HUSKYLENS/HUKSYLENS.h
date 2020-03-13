@@ -1,7 +1,20 @@
+/*!
+ * @file HUKSYLENS.h
+ * @brief HUKSYLENS - An Easy-to-use AI Machine Vision Sensor
+ * @n Header file for HUKSYLENS
+ *
+ * @copyright	[DFRobot]( http://www.dfrobot.com ), 2016
+ * @copyright	GNU Lesser General Public License
+ *
+ * @author [Angelo](Angelo.qiao@dfrobot.com)
+ * @version  V1.0.0
+ * @date  2020-03-13
+ */
+
+#include "Arduino.h"
 #include "Wire.h"
 #include "SoftwareSerial.h"
 #include "HuskyLensProtocolCore.h"
-#include "Arduino.h"
 
 #ifndef _HUKSYLENS_H
 #define _HUKSYLENS_H
@@ -30,6 +43,11 @@ enum protocolCommand{
     COMMAND_REQUEST_ALGORITHM,
 
     COMMAND_RETURN_OK,
+
+    COMMAND_REQUEST_LEARN,
+    COMMAND_REQUEST_FORGET,
+
+    COMMAND_REQUEST_SENSOR,
 };
 
 typedef struct{
@@ -147,6 +165,7 @@ private:
     Protocol_t* protocolPtr = NULL;
 
     bool processReturn(){
+        currentIndex = 0;
         if (!wait(COMMAND_RETURN_INFO)) return false;
         protocolReadReturnInfo(protocolInfo);
         protocolPtr = (Protocol_t*) realloc(protocolPtr, max(protocolInfo.protocolSize, 1) * sizeof(Protocol_t));
@@ -194,80 +213,9 @@ private:
         return false;
     }
 
-
-    HUSKYLENSResult readBlock(int ID = 1, int index=0){
-        Protocol_t* protocol = readBlockByIDProtocol(ID, index);
-        return protocol?*protocol:resultDefault;
-    }
-    HUSKYLENSResult readBlockDirect(int index){
-        Protocol_t* protocol = readBlockProtocol(index);
-        return protocol?*protocol:resultDefault;
-    }
-
-    HUSKYLENSResult readArrow(int ID = 1, int index=0){
-        Protocol_t* protocol = readArrowByIDProtocol(ID, index);
-        return protocol?*protocol:resultDefault;
-    }
-    HUSKYLENSResult readArrowDirect(int index){
-        Protocol_t* protocol = readArrowProtocol(index);
-        return protocol?*protocol:resultDefault;
-    }
-
-
 public:
-
-
-    class Blocks
-    {
-        private:
-            HUKSYLENS *entity;
-        public:
-            void init(HUKSYLENS *e){
-                entity = e;
-            }
-
-            int available(){
-                return entity->countBlocks();
-            }
-            HUSKYLENSResult readDirect(int index){
-                return entity->readBlockDirect(index);
-            }
-
-            int available(int ID){
-                return entity->countBlocks(ID);
-            }
-            HUSKYLENSResult read(int ID = 1, int index =0){
-                return entity->readBlock(ID, index);
-            }
-    } blocks;
-
-    class Arrows
-    {
-        private:
-            HUKSYLENS *entity;
-        public:
-            void init(HUKSYLENS *e){
-                entity = e;
-            }
-            int available(){
-                return entity->countArrows();
-            }
-            HUSKYLENSResult readDirect(int index){
-                return entity->readArrowDirect(index);
-            }
-
-            int available(int ID){
-                return entity->countArrows(ID);
-            }
-            HUSKYLENSResult read(int ID = 1, int index = 0){
-                return entity->readArrow(ID, index);
-            }
-    } arrows;
-
     HUKSYLENS(/* args */)
     {
-        blocks.init(this);
-        arrows.init(this);
         wire = NULL;
         stream = NULL;
         resultDefault.command = -1;
@@ -302,12 +250,32 @@ public:
         protocolWriteRequest();
         return processReturn();
     }
+    bool request(int16_t ID){
+        Protocol_t protocol;
+        protocol.requestID = ID;
+        protocolWriteRequestByID(protocol);
+        return processReturn();
+    }
+
     bool requestBlocks(){
         protocolWriteRequestBlocks();
         return processReturn();
     }
+    bool requestBlocks(int16_t ID){
+        Protocol_t protocol;
+        protocol.requestID = ID;
+        protocolWriteRequestBlocksByID(protocol);
+        return processReturn();
+    }
+
     bool requestArrows(){
         protocolWriteRequestArrows();
+        return processReturn();
+    }
+    bool requestArrows(int16_t ID){
+        Protocol_t protocol;
+        protocol.requestID = ID;
+        protocolWriteRequestArrowsByID(protocol);
         return processReturn();
     }
     bool requestLearned(){
@@ -322,31 +290,16 @@ public:
         protocolWriteRequestArrowsLearned();
         return processReturn();
     }
-    bool request(int16_t ID){
-        Protocol_t protocol;
-        protocol.requestID = ID;
-        protocolWriteRequestByID(protocol);
-        return processReturn();
-    }
-    bool requestBlocks(int16_t ID){
-        Protocol_t protocol;
-        protocol.requestID = ID;
-        protocolWriteRequestBlocksByID(protocol);
-        return processReturn();
-    }
-    bool requestArrows(int16_t ID){
-        Protocol_t protocol;
-        protocol.requestID = ID;
-        protocolWriteRequestArrowsByID(protocol);
-        return processReturn();
-    }
+
 
     int available(){
-        return count();
+        int result = count();
+        currentIndex = min(currentIndex, result);
+        return result - currentIndex;
     }
 
-    int available(int ID){
-        return count(ID);
+    HUSKYLENSResult read(){
+        return (get(currentIndex++));
     }
 
     bool isLearned(){
@@ -368,6 +321,15 @@ public:
     int16_t count(){
         return protocolInfo.protocolSize;
     }
+    int16_t count(int16_t ID){
+        int16_t counter = 0;
+        for (int i = 0; i < protocolInfo.protocolSize; i++)
+        {
+            if(protocolPtr[i].ID == ID) counter++;
+        }
+        return counter;
+    }
+
     int16_t countBlocks(){
         int16_t counter = 0;
         for (int i = 0; i < protocolInfo.protocolSize; i++)
@@ -376,11 +338,28 @@ public:
         }
         return counter;
     }
+    int16_t countBlocks(int16_t ID){
+        int16_t counter = 0;
+        for (int i = 0; i < protocolInfo.protocolSize; i++)
+        {
+            if(protocolPtr[i].command == COMMAND_RETURN_BLOCK && protocolPtr[i].ID == ID) counter++;
+        }
+        return counter;
+    }
+
     int16_t countArrows(){
         int16_t counter = 0;
         for (int i = 0; i < protocolInfo.protocolSize; i++)
         {
             if(protocolPtr[i].command == COMMAND_RETURN_ARROW) counter++;
+        }
+        return counter;
+    }
+    int16_t countArrows(int16_t ID){
+        int16_t counter = 0;
+        for (int i = 0; i < protocolInfo.protocolSize; i++)
+        {
+            if(protocolPtr[i].command == COMMAND_RETURN_ARROW && protocolPtr[i].ID == ID) counter++;
         }
         return counter;
     }
@@ -410,120 +389,84 @@ public:
         return counter;
     }
 
-    int16_t count(int16_t ID){
-        int16_t counter = 0;
-        for (int i = 0; i < protocolInfo.protocolSize; i++)
-        {
-            if(protocolPtr[i].ID == ID) counter++;
-        }
-        return counter;
-    }
-    int16_t countBlocks(int16_t ID){
-        int16_t counter = 0;
-        for (int i = 0; i < protocolInfo.protocolSize; i++)
-        {
-            if(protocolPtr[i].command == COMMAND_RETURN_BLOCK && protocolPtr[i].ID == ID) counter++;
-        }
-        return counter;
-    }
-    int16_t countArrows(int16_t ID){
-        int16_t counter = 0;
-        for (int i = 0; i < protocolInfo.protocolSize; i++)
-        {
-            if(protocolPtr[i].command == COMMAND_RETURN_ARROW && protocolPtr[i].ID == ID) counter++;
-        }
-        return counter;
-    }
 
 
-
-    Protocol_t* readProtocol(int16_t index){
+    HUSKYLENSResult get(int16_t index){
         if (index < count())
         {
-            return protocolPtr + index;
+            return protocolPtr[index];
         }
-        return NULL;
+        return resultDefault;
     }
-    Protocol_t* readBlockProtocol(int16_t index){
+    HUSKYLENSResult get(int16_t ID, int16_t index){
         int16_t counter = 0;
         for (int i = 0; i < protocolInfo.protocolSize; i++)
         {
-            if(protocolPtr[i].command == COMMAND_RETURN_BLOCK) if(index == counter++) return protocolPtr + i;
+            if(protocolPtr[i].ID == ID) if(index == counter++) return protocolPtr[i];
         }
-        return NULL;
-    }
-    Protocol_t* readArrowProtocol(int16_t index){
-        int16_t counter = 0;
-        for (int i = 0; i < protocolInfo.protocolSize; i++)
-        {
-            if(protocolPtr[i].command == COMMAND_RETURN_ARROW) if(index == counter++) return protocolPtr + i;
-        }
-        return NULL;
+        return resultDefault;
     }
 
-    Protocol_t* readLearnedProtocol(int16_t index){
+    HUSKYLENSResult getBlock(int16_t index){
         int16_t counter = 0;
         for (int i = 0; i < protocolInfo.protocolSize; i++)
         {
-            if(protocolPtr[i].ID) if(index == counter++) return protocolPtr + i;
+            if(protocolPtr[i].command == COMMAND_RETURN_BLOCK) if(index == counter++) return protocolPtr[i];
         }
-        return NULL;
+        return resultDefault;
     }
-    Protocol_t* readBlockLearnedProtocol(int16_t index){
+    HUSKYLENSResult getBlock(int16_t ID, int16_t index){
         int16_t counter = 0;
         for (int i = 0; i < protocolInfo.protocolSize; i++)
         {
-            if(protocolPtr[i].command == COMMAND_RETURN_BLOCK && protocolPtr[i].ID) if(index == counter++) return protocolPtr + i;
+            if(protocolPtr[i].command == COMMAND_RETURN_BLOCK && protocolPtr[i].ID == ID) if(index == counter++) return protocolPtr[i];
         }
-        return NULL;
-    }
-    Protocol_t* readArrowLearnedProtocol(int16_t index){
-        int16_t counter = 0;
-        for (int i = 0; i < protocolInfo.protocolSize; i++)
-        {
-            if(protocolPtr[i].command == COMMAND_RETURN_ARROW && protocolPtr[i].ID) if(index == counter++) return protocolPtr + i;
-        }
-        return NULL;
+        return resultDefault;
     }
 
-    Protocol_t* readByIDProtocol(int16_t ID, int16_t index){
+    HUSKYLENSResult getArrow(int16_t index){
         int16_t counter = 0;
         for (int i = 0; i < protocolInfo.protocolSize; i++)
         {
-            if(protocolPtr[i].ID == ID) if(index == counter++) return protocolPtr + i;
+            if(protocolPtr[i].command == COMMAND_RETURN_ARROW) if(index == counter++) return protocolPtr[i];
         }
-        return NULL;
+        return resultDefault;
     }
-    Protocol_t* readBlockByIDProtocol(int16_t ID, int16_t index){
+    HUSKYLENSResult getArrow(int16_t ID, int16_t index){
         int16_t counter = 0;
         for (int i = 0; i < protocolInfo.protocolSize; i++)
         {
-            if(protocolPtr[i].command == COMMAND_RETURN_BLOCK && protocolPtr[i].ID == ID) if(index == counter++) return protocolPtr + i;
+            if(protocolPtr[i].command == COMMAND_RETURN_ARROW && protocolPtr[i].ID == ID) if(index == counter++) return protocolPtr[i];
         }
-        return NULL;
-    }
-    Protocol_t* readArrowByIDProtocol(int16_t ID, int16_t index){
-        int16_t counter = 0;
-        for (int i = 0; i < protocolInfo.protocolSize; i++)
-        {
-            if(protocolPtr[i].command == COMMAND_RETURN_ARROW && protocolPtr[i].ID == ID) if(index == counter++) return protocolPtr + i;
-        }
-        return NULL;
+        return resultDefault;
     }
 
+    HUSKYLENSResult getLearned(int16_t index){
+        int16_t counter = 0;
+        for (int i = 0; i < protocolInfo.protocolSize; i++)
+        {
+            if(protocolPtr[i].ID) if(index == counter++) return protocolPtr[i];
+        }
+        return resultDefault;
+    }
+    HUSKYLENSResult getBlockLearned(int16_t index){
+        int16_t counter = 0;
+        for (int i = 0; i < protocolInfo.protocolSize; i++)
+        {
+            if(protocolPtr[i].command == COMMAND_RETURN_BLOCK && protocolPtr[i].ID) if(index == counter++) return protocolPtr[i];
+        }
+        return resultDefault;
+    }
+    HUSKYLENSResult getArrowLearned(int16_t index){
+        int16_t counter = 0;
+        for (int i = 0; i < protocolInfo.protocolSize; i++)
+        {
+            if(protocolPtr[i].command == COMMAND_RETURN_ARROW && protocolPtr[i].ID) if(index == counter++) return protocolPtr[i];
+        }
+        return resultDefault;
+    }
 
     
-
-    HUSKYLENSResult read(int ID = 1, int index = 0){
-        Protocol_t* protocol = readByIDProtocol(ID, index);
-        return protocol?*protocol:resultDefault;
-    }
-    HUSKYLENSResult readDirect(int index){
-        Protocol_t* protocol = readProtocol(index);
-        return protocol?*protocol:resultDefault;
-    }
-
-
 
     bool writeAlgorithm(protocolAlgorithm algorithmType){
         Protocol_t protocol;
@@ -532,10 +475,26 @@ public:
         return wait(COMMAND_RETURN_OK);
     }
 
+    bool writeLearn(int ID){
+        Protocol_t protocol;
+        protocol.requestID = ID;
+        protocolWriteRequestLearn(protocol);
+        return wait(COMMAND_RETURN_OK);
+    }
 
+    bool writeForget(){
+        protocolWriteRequestForget();
+        return wait(COMMAND_RETURN_OK);
+    }
 
-
-
+    bool writeSensor(int sensor0, int sensor1, int sensor2){
+        Protocol_t protocol;
+        protocol.first = sensor0;
+        protocol.second = sensor1;
+        protocol.third = sensor2;
+        protocolWriteRequestSensor(protocol);
+        return wait(COMMAND_RETURN_OK);
+    }
 
     ////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////
@@ -651,7 +610,10 @@ public:
 
     PROTOCOL_CREATE(ReturnOK, Command, COMMAND_RETURN_OK)
 
-    ////////////////////////////////////////////////////////////////////////////////////////////
+    PROTOCOL_CREATE(RequestLearn, OneInt16, COMMAND_REQUEST_LEARN)
+    PROTOCOL_CREATE(RequestForget, Command, COMMAND_REQUEST_FORGET)
+
+    PROTOCOL_CREATE(RequestSensor, FiveInt16, COMMAND_REQUEST_SENSOR)    ////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////
 

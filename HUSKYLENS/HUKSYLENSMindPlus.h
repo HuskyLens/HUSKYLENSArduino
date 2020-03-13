@@ -93,7 +93,7 @@ public:
     }
 
     HUSKYLENSBlockInfo readBlockParameter(int ID, int index=1){
-        HUSKYLENSResult result = blocks.read(ID, index-1);
+        HUSKYLENSResult result = getBlock(ID, index-1);
         HUSKYLENSBlockInfo block;
         block.xCenter = result.xCenter;
         block.yCenter = result.yCenter;
@@ -103,7 +103,7 @@ public:
     } 
 
     HUSKYLENSArrowInfo readArrowParameter(int ID, int index=1){
-        HUSKYLENSResult result = arrows.read(ID, index-1);
+        HUSKYLENSResult result = getArrow(ID, index-1);
         HUSKYLENSArrowInfo arrow;
         arrow.xOrigin = result.xOrigin;
         arrow.yOrigin = result.yOrigin;
@@ -128,9 +128,9 @@ public:
         int32_t distanceMin = INT32_MAX;
         int16_t distanceMinIndex = -1;
 
-        for (int i = 0; i < blocks.available(); i++)
+        for (int i = 0; i < countBlocks(); i++)
         {
-            HUSKYLENSResult resultBuffer = blocks.readDirect(i);
+            HUSKYLENSResult resultBuffer = getBlock(i);
             int32_t distance = sq(resultBuffer.xCenter - 320/2) + sq(resultBuffer.yCenter - 240/2);
             if (distance < distanceMin)
             {
@@ -139,7 +139,7 @@ public:
             }
         }
 
-        HUSKYLENSResult result = blocks.readDirect(distanceMinIndex);
+        HUSKYLENSResult result = getBlock(distanceMinIndex);
         HUSKYLENSBlockDirectInfo block;
         block.xCenter = result.xCenter;
         block.yCenter = result.yCenter;
@@ -153,9 +153,9 @@ public:
         int32_t distanceMin = INT32_MAX;
         int16_t distanceMinIndex = -1;
 
-        for (int i = 0; i < arrows.available(); i++)
+        for (int i = 0; i < countArrows(); i++)
         {
-            HUSKYLENSResult resultBuffer = arrows.readDirect(i);
+            HUSKYLENSResult resultBuffer = getArrow(i);
             int32_t distance = sq((resultBuffer.xOrigin + resultBuffer.xTarget)/2 - 320/2) + sq((resultBuffer.yOrigin + resultBuffer.yTarget)/2 - 240/2);
             if (distance < distanceMin)
             {
@@ -164,7 +164,7 @@ public:
             }
         }
 
-        HUSKYLENSResult result = arrows.readDirect(distanceMinIndex);
+        HUSKYLENSResult result = getArrow(distanceMinIndex);
         HUSKYLENSArrowDirectInfo arrow;
         arrow.xOrigin = result.xOrigin;
         arrow.yOrigin = result.yOrigin;
@@ -191,15 +191,15 @@ public:
     }
 
     float readIDLearned(int index, HUSKYLENSResultType type){
-        Protocol_t* protocol;
+        Protocol_t protocol;
         switch (type)
         {
         case HUSKYLENSResultBlock:
-            protocol = readBlockLearnedProtocol(index);
-            return protocol? (float)protocol->ID : -1.0f;
+            protocol = getBlockLearned(index);
+            return protocol.ID;
         case HUSKYLENSResultArrow:
-            protocol = readArrowLearnedProtocol(index);
-            return protocol? (float)protocol->ID : -1.0f;
+            protocol = getArrowLearned(index);
+            return protocol.ID;
         default:
             return -1.0f;        
         }
@@ -218,7 +218,7 @@ public:
     }
 
     HUSKYLENSBlockDirectInfo readBlockParameterDirect(int index){
-        HUSKYLENSResult result = blocks.readDirect(index-1);
+        HUSKYLENSResult result = getBlock(index-1);
         HUSKYLENSBlockDirectInfo block;
         block.xCenter = result.xCenter;
         block.yCenter = result.yCenter;
@@ -229,7 +229,7 @@ public:
     } 
 
     HUSKYLENSArrowDirectInfo readArrowParameterDirect(int index){
-        HUSKYLENSResult result = arrows.readDirect(index-1);
+        HUSKYLENSResult result = getArrow(index-1);
         HUSKYLENSArrowDirectInfo arrow;
         arrow.xOrigin = result.xOrigin;
         arrow.yOrigin = result.yOrigin;
