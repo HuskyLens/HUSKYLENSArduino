@@ -1,5 +1,5 @@
 /***************************************************
- HUKSYLENS An Easy-to-use AI Machine Vision Sensor
+ HUSKYLENS An Easy-to-use AI Machine Vision Sensor
  <https://www.dfrobot.com/product-1922.html>
  
  ***************************************************
@@ -20,10 +20,10 @@
  2.This code is tested on Arduino Uno, Leonardo, Mega boards.
  ****************************************************/
 
-#include "HUKSYLENSMindPlus.h"
+#include "HUSKYLENSMindPlus.h"
 #include "SoftwareSerial.h"
 
-HUKSYLENSMindPlus huskylensMindPlus;
+HUSKYLENSMindPlus huskylensMindPlus;
 
 void setup() {
     Serial.begin(115200);

@@ -1,5 +1,5 @@
 /***************************************************
- HUKSYLENS An Easy-to-use AI Machine Vision Sensor
+ HUSKYLENS An Easy-to-use AI Machine Vision Sensor
  <https://www.dfrobot.com/product-1922.html>
  
  ***************************************************
@@ -19,10 +19,10 @@
  2.This code is tested on Arduino Uno, Leonardo, Mega boards.
  ****************************************************/
 
-#include "HUKSYLENS.h"
+#include "HUSKYLENS.h"
 #include "SoftwareSerial.h"
 
-HUKSYLENS huskylens;
+HUSKYLENS huskylens;
 //HUSKYLENS green line >> SDA; blue line >> SCL
 int ID0 = 0; //not learned results. Grey result on HUSKYLENS screen
 int ID1 = 1; //first learned results. colored result on HUSKYLENS screen
@@ -37,7 +37,7 @@ void setup() {
     while (!huskylens.begin(Wire))
     {
         Serial.println(F("Begin failed!"));
-        Serial.println(F("1.Please recheck the \"Protocol Type\" in HUKSYLENS (General Settings>>Protocol Type>>I2C)"));
+        Serial.println(F("1.Please recheck the \"Protocol Type\" in HUSKYLENS (General Settings>>Protocol Type>>I2C)"));
         Serial.println(F("2.Please recheck the connection."));
         delay(100);
     }

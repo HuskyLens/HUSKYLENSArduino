@@ -1,7 +1,7 @@
-#include "HUKSYLENS.h"
+#include "HUSKYLENS.h"
 
-#ifndef _HUKSYLENS_MIND_PLUS_H
-#define _HUKSYLENS_MIND_PLUS_H
+#ifndef _HUSKYLENS_MIND_PLUS_H
+#define _HUSKYLENS_MIND_PLUS_H
 
 typedef struct HUSKYLENSBlockInfo_t
 {
@@ -43,7 +43,7 @@ typedef enum HUSKYLENSResultType_t
     HUSKYLENSResultArrow,
 }HUSKYLENSResultType;
 
-class HUKSYLENSMindPlus : public HUKSYLENS
+class HUSKYLENSMindPlus : public HUSKYLENS
 {
 private:
     bool isWire = false;
@@ -72,12 +72,12 @@ public:
 
     bool writeAlgorithm(protocolAlgorithm algorithmType){
         Wire.setClock(100000);
-        HUKSYLENS::writeAlgorithm(algorithmType);
+        HUSKYLENS::writeAlgorithm(algorithmType);
     }
 
     bool request(){
         Wire.setClock(100000);
-        HUKSYLENS::request();
+        HUSKYLENS::request();
     }
 
     bool isAppear(int ID, HUSKYLENSResultType type){

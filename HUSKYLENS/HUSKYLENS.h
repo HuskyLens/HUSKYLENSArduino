@@ -1,7 +1,7 @@
 /*!
- * @file HUKSYLENS.h
- * @brief HUKSYLENS - An Easy-to-use AI Machine Vision Sensor
- * @n Header file for HUKSYLENS
+ * @file HUSKYLENS.h
+ * @brief HUSKYLENS - An Easy-to-use AI Machine Vision Sensor
+ * @n Header file for HUSKYLENS
  *
  * @copyright	[DFRobot]( http://www.dfrobot.com ), 2016
  * @copyright	GNU Lesser General Public License
@@ -16,8 +16,8 @@
 #include "SoftwareSerial.h"
 #include "HuskyLensProtocolCore.h"
 
-#ifndef _HUKSYLENS_H
-#define _HUKSYLENS_H
+#ifndef _HUSKYLENS_H
+#define _HUSKYLENS_H
 
 
 ////////////////////////////////////////////////////////////////////////////
@@ -104,7 +104,7 @@ enum protocolAlgorithm{
 
 typedef Protocol_t HUSKYLENSResult;
 
-class HUKSYLENS
+class HUSKYLENS
 {
 private:
     TwoWire *wire;
@@ -214,7 +214,7 @@ private:
     }
 
 public:
-    HUKSYLENS(/* args */)
+    HUSKYLENS(/* args */)
     {
         wire = NULL;
         stream = NULL;
@@ -226,7 +226,7 @@ public:
         resultDefault.fifth = -1;
     }
 
-    ~HUKSYLENS()
+    ~HUSKYLENS()
     {
     }
 
