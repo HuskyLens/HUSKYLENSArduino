@@ -2,7 +2,7 @@
 
 ### Version:
 
-0.1
+0.1.1
 
 ### Designer:
 
@@ -10,8 +10,14 @@ Angelo (Angelo.qiao@dfrobot.com)
 
 ### Init parameter:
 
+#### Serial
 * Serial Mode: 9600 (bps) 8N1
-* Address: 0x11
+* Address in Protocol: 0x11
+
+#### I2C
+* I2C Speed: 100 kbit/s
+* I2C Address: 0x32
+* Address in Protocol: 0x11
 
 ### Communication Command Frame Format:
 
