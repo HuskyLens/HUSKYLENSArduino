@@ -466,8 +466,6 @@ public:
         return resultDefault;
     }
 
-    
-
     bool writeAlgorithm(protocolAlgorithm algorithmType){
         Protocol_t protocol;
         protocol.algorithmType = algorithmType;
