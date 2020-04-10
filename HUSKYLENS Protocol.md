@@ -267,7 +267,7 @@ When HUSKYLENS receives this command, HUSKYLENS will change the algorithm by the
 | Data | Function                                                     |
 | ---- | ------------------------------------------------------------ |
 | 0x01 | Change to  ALGORITHM_OBJECT_TRACKING (Low Byte of 1 = 0x0001) |
-| 0x00 | Change to  ALGORITHM_OBJECT_TRACKING (High Byte of 1 = 0x0001) |
+| 0x00 | Change to  ALGORITHM_OBJECT_TRACKING (High Byte of 0 = 0x0000) |
 
 Data's correspondent algorithm:
 
