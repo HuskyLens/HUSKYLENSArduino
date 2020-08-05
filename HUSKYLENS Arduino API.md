@@ -7,11 +7,12 @@
 ### Designer:
 
 Angelo (Angelo.qiao@dfrobot.com)
+Robert (robert@dfrobot.com)
 
 ## struct HUSKYLENSResult
 
 * **Description:** Structure to store the blocks or arrows
-* **Member: **
+* **Member:**
   * `command` Use to determine whether this is arrow or block
     * `COMMAND_RETURN_BLOCK` It is a block
     * `COMMAND_RETURN_ARROW` It is an arrow
@@ -45,12 +46,12 @@ void printResult(HUSKYLENSResult result){
 
 ## ID Meaning:
 
-| ID   | Means                                                        |
-| ---- | ------------------------------------------------------------ |
-| 1    | The first learned item is detected                           |
-| 2    | The second learned item is detected                          |
-| XXX  | The XXXth learned item is detected                           |
-| 0    | Item is detected but not learned, like unlearned faces block in grey color. |
+| ID  | Means                                                                       |
+| --- | --------------------------------------------------------------------------- |
+| 1   | The first learned item is detected                                          |
+| 2   | The second learned item is detected                                         |
+| XXX | The XXXth learned item is detected                                          |
+| 0   | Item is detected but not learned, like unlearned faces block in grey color. |
 
 ## enum protocolAlgorithm
 
@@ -69,14 +70,14 @@ void printResult(HUSKYLENSResult result){
   * **Description:** Setup procedure of HUSKYLENS with Wire(I2C). It will try connect to HUSKYLENS and return whether HUSKYLENS is connected.
   * **Arguments:**
     * `streamInput` : It could be Serial, Wire, SoftwareSerial, or other port based on Stream class.
-  * **Returns:**Whether successful connect and contact with HUSKYLENS.
+  * **Returns:** Whether successful connect and contact with HUSKYLENS.
 
 ## bool begin(Stream& streamInput)
 
   * **Description:** Setup procedure of HUSKYLENS. It will try connect to HUSKYLENS and return whether HUSKYLENS is connected.
   * **Arguments:**
     * `streamInput` : It could be Serial, Wire, SoftwareSerial, or other port based on Stream class.
-  * **Returns:**Whether successful connect and contact with HUSKYLENS.
+  * **Returns:** Whether successful connect and contact with HUSKYLENS.
 
 ## **void** setTimeOutDuration(**unsigned** **long** timeOutDurationInput)
 
@@ -88,61 +89,58 @@ void printResult(HUSKYLENSResult result){
 
   * **Description:** Request all blocks and arrows from HUSKYLENS. This is the place where all the transmit happens.
   * **Arguments:** None
-  * **Returns:**Whether successfully get the result.
+  * **Returns:** Whether successfully get the result.
 
 ## bool request(int16_t ID)
 
   * **Description:** Request only blocks and arrows tagged with `ID` from HUSKYLENS.
   * **Arguments:**
       * `ID` The target ID of  blocks and arrows
-  * **Returns:**Whether successfully get the result.
+  * **Returns:** Whether successfully get the result.
 
 ## bool requestBlocks()
   * **Description:** Request all blocks from HUSKYLENS
-  * **Returns: ** Whether successfully get the result.
+  * **Returns:** Whether successfully get the result.
 
 ## bool requestBlocks(int16_t ID)
   * **Description:** Request only blocks tagged with `ID` from HUSKYLENS
   * **Arguments:**
     * `ID` The target ID of  blocks
-  * **Returns: ** Whether successfully get the result..
+  * **Returns:** Whether successfully get the result..
 
 ## bool requestArrows()
-
-
   * **Description:** Request all arrows from HUSKYLENS
   * **Arguments:**
-
       * `algorithmType` The algorithm you need. See protocolAlgorithm for details.
-  * **Returns: ** Whether successfully get the result.
+  * **Returns:** Whether successfully get the result.
 
 ## bool requestArrows(int16_t ID)
 
   * **Description:** Request only arrows tagged with `ID` from HUSKYLENS
   * **Arguments:**
     * `ID` The target ID of  arrows
-  * **Returns: ** Whether successfully get the result.
+  * **Returns:** Whether successfully get the result.
 
 ## bool requestLearned()
 
   * **Description:** Request all learned blocks and arrows (ID >=1) from HUSKYLENS.
 
 
-  * **Returns: ** Whether successfully get the result.
+  * **Returns:** Whether successfully get the result.
 
 ## bool requestBlocksLearned()
 
   * **Description:** Request all learned blocks (ID >=1) from HUSKYLENS.
 
 
-  * **Returns: ** Whether successfully get the result.
+  * **Returns:** Whether successfully get the result.
 
 ## bool requestArrowsLearned()
 
   * **Description:** Request all learned arrows (ID >=1) from HUSKYLENS.
 
 
-  * **Returns: ** Whether successfully get the result.
+  * **Returns:** Whether successfully get the result.
 
 ## int available()
 
@@ -150,14 +148,14 @@ void printResult(HUSKYLENSResult result){
 
 
   * **Arguments:** None
-  * **Returns:**The count of blocks and arrows left in the buffer.
+  * **Returns:** The count of blocks and arrows left in the buffer.
 
 ## HUSKYLENSResult read()
 
   * **Description:** Read blocks or arrows.(Works like Serial or Wire)
 
 
-  * **Returns: ** blocks or arrows in struct HUSKYLENSResult. See HUSKYLENSResult above for details.
+  * **Returns:** blocks or arrows in struct HUSKYLENSResult. See HUSKYLENSResult above for details.
 
 ## bool isLearned()
 
@@ -334,37 +332,84 @@ void printResult(HUSKYLENSResult result){
   * **Returns:**  block in struct HUSKYLENSResult. See HUSKYLENSResult above for details.
 
 ## HUSKYLENSResult getArrowLearned(int16_t index)
-
   * **Description:** Get one of the learned arrows (ID >=1)
   * **Arguments:**
     * `index` The index of arrows, which is ordered by the received sequence. It should less than `countArrowsLearned()`
-
 
   * **Returns:**  arrow in struct HUSKYLENSResult. See HUSKYLENSResult above for details.
 
 ## **bool** writeAlgorithm(protocolAlgorithm algorithmType)
 
   * **Description:** Let HUSKYLENS switch to the target algorithm you need.
-
-
   * **Arguments:**
-
       * `algorithmType` The target algorithm. See protocolAlgorithm for details.
-  * **Returns: ** Whether success.
+
+  * **Returns:** Whether success.
 
 ## **bool** writeLearn(**int** ID)
 
   * **Description:** Let HUSKYLENS learn with `ID`. (It only works in Object Classification)
-
-
   * **Arguments:**
-* `ID` The target ID. See ID Meaning above for details.
-* **Returns: ** Whether success.
+    * `ID` The target ID. See ID Meaning above for details.
+
+* **Returns:** Whether success.
 
 ## **bool** writeForget()
 
   * **Description:** Let HUSKYLENS forget all. (It only works in Object Classification)
+ 
+* **Returns:** Whether success.
+
+## **bool** setCustomName(String name,uint8_t id)
+
+  * **Description:** Set a custom name for a learned object with a specified ID. For example, if you have learned your face with an ID of 1, you can use setCustomName("Robert",1) to rename the learned face to "Robert".
+  * **Arguments:**
+      * `name` The specified custom name
+      * `id`   The ID of the object you want to set the custom name for
+  
+* **Returns:** Whether success.
+  
+## **bool** savePictureToSDCard()
+  * **Description:** Save a photo from the HuskyLens camera onto the SD Card. 
+  * **Returns:** Whether success. If there is no SD Card inserted or an SD Card Error, there will be a UI popup on the HuskyLens outlining the issue. 
+
+## **bool** saveScreenshotToSDCard()
+  * **Description:** Save a screenshot of the HuskyLens UI onto the SD Card. 
+  * **Returns:** Whether success.
+
+## **bool** saveModelToSDCard(int fileNum)
+  * **Description:** Save the current algorithms model file (its learned object data) to the SD Card. The file will be the in the format "AlgorithimName_Backup_*FileNum*.conf"
+  * **Arguments:**
+      * `fileNum` The specified file number to be used in the name for the file
+  * **Returns:** Whether success. If there is no SD Card inserted or an SD Card Error, there will be a UI popup on the HuskyLens outlining the issue. 
+
+## **bool** loadModelFromSDCard(int fileNum)
+  * **Description:** Load a model file from the SD Card to the current algorithm and refresh the algorithm. The loaded file will be the following format "AlgorithimName_Backup_*FileNum*.conf" 
+  * **Arguments:**
+      * `fileNum` The specified file number to be used in the name for the file
+  * **Returns:** Whether success. If there is no SD Card inserted or an SD Card Error, there will be a UI popup on the HuskyLens outlining the issue. 
+
+## **bool** customText(String text,uint16_t x,uint8_t y)
+  * **Description:** Place a string of text (less than 20 characters) on top of the HuskyLens UI. The position of the texts (X,Y) coordinate is the top left of the text box.
+    * You can have at most 10 custom texts on the UI at once, and if you continue adding texts you will replace previous texts in a circular fashion. For example, if you enter 10 texts you will fill the text buffer.  If you then insert a new text object, you will overwrite the first text position (textBuffer[0]). Inserting another new text object will overwrite the second text position (textBuffer[1]). 
+    * Each text is uniquely identified by its (X,Y) coordinate, so you can replace the text string at a (X,Y) coordinate instead of adding a new text object. For example, if you insert "TEST_1" at (120,120) and then later submit "TEST_2" at (120,120), you will replace the string "TEST_1" with "TEST_2" and maintain an overall text count of 1.
+  * **Arguments:**
+      * `text` The specified text you wish to enter on the screen
+      * `x` The X coordinate for the UI Object (0-320)
+      * `y` The Y coordinate for the UI Object (0-240)
+  * **Returns:** Whether success.
+
+## **bool** clearCustomText()
+  * **Description:** Clear and delete all custom UI texts from the screen.
+  * **Returns:** Whether success.
+
+## **bool** isPro()
+  * **Description:** Detect whether the HuskyLens is a Pro or Standard Model
+  * **Returns:** True is Pro Model, False if Standard
+ 
+## **bool** checkFirmwareVersion()
+  * **Description:** Check if the onboard firmware is out of date. If it is an old firmware, there will be a UI message that pops   up on the screen 
+  * **Returns:** Whether success.
 
 
-* **Returns: ** Whether success.
 

@@ -162,6 +162,13 @@ void husky_lens_protocol_write_float(float content){
     send_index += sizeof(content);
 }
 
+void husky_lens_protocol_write_buffer_uint8(uint8_t *content, uint32_t length)
+{
+    if(send_index + sizeof(uint8_t) * length >= FRAME_BUFFER_SIZE) {send_fail = true; return;}
+    memcpy(send_buffer + send_index, content, sizeof(uint8_t) * length);
+    send_index += sizeof(uint8_t) * length;
+}
+
 int husky_lens_protocol_write_end(){
     if(send_fail) {return 0;}
     if(send_index + 1 >= FRAME_BUFFER_SIZE) {return 0;}

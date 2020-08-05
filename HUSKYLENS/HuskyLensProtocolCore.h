@@ -24,6 +24,7 @@ void husky_lens_protocol_write_uint8(uint8_t content);
 void husky_lens_protocol_write_int16(int16_t content);
 void husky_lens_protocol_write_int32(int32_t content);
 void husky_lens_protocol_write_float(float content);
+void husky_lens_protocol_write_buffer_uint8(uint8_t *content, uint32_t length);
 int husky_lens_protocol_write_end();
 
 #define IS_BIG_ENDIAN() (!*(uint8_t *)&(uint16_t){1})
