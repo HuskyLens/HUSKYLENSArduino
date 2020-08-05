@@ -7,6 +7,7 @@
 ### Designer:
 
 Angelo (Angelo.qiao@dfrobot.com)
+
 Robert (robert@dfrobot.com)
 
 ## struct HUSKYLENSResult
