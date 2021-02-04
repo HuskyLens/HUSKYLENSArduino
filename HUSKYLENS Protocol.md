@@ -81,6 +81,13 @@ Robert (robert@dfrobot.com)
 |                               |                           |
 | COMMAND_REQUEST_ALGORITHM===> |                           |
 |                               | <===COMMAND_RETURN_OK     |
+|                               |                           |
+| COMMAND_REQUEST_ALGORITHM===> |                           |
+| COMMAND_REQUEST_ALGORITHM===> |                           |
+|                               | <===COMMAND_RETURN_BUSY   |
+|                               | <===COMMAND_RETURN_OK     |
+
+
 
 
 
@@ -449,3 +456,30 @@ The return value for the IS_PRO command will send a 1 (logical True) if it is a 
 | ---- | ------------------------------ |
 | 0x01 | LOW&nbsp; Byte of return value |
 | 0x00 | HIGH Byte of return value      |
+
+### COMMAND_REQUEST_FIRMWARE_VERSION(0x3C):
+
+
+
+### COMMAND_RETURN_BUSY(0x3D):
+
+HUSKYLENS will return Busy, if send multiple command and not wait for ok.
+
+| Header | Header 2 | Address | Data Length | Command | Checksum |
+| :----- | :------- | :------ | :---------- | :------ | :------- |
+| 0x55   | 0xAA     | 0x11    | 0x00        | 0x3D    | 0x4D     |
+
+### COMMAND_RETURN_NEED_PRO(0x3E):
+
+HUSKYLENS will return need pro, if send pro only command to huskylens.
+
+| Header | Header 2 | Address | Data Length | Command | Checksum |
+| :----- | :------- | :------ | :---------- | :------ | :------- |
+| 0x55   | 0xAA     | 0x11    | 0x00        | 0x3E    | 0x4E     |
+
+###
+
+
+
+
+
