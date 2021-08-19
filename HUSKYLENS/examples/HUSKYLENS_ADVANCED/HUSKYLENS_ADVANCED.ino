@@ -20,7 +20,6 @@
  ****************************************************/
 
 #include "HUSKYLENS.h"
-#include "SoftwareSerial.h"
 
 HUSKYLENS huskylens;
 //HUSKYLENS green line >> SDA; blue line >> SCL
