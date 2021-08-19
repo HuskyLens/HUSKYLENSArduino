@@ -14,7 +14,6 @@
 
 #include "Arduino.h"
 #include "Wire.h"
-#include "SoftwareSerial.h"
 #include "HuskyLensProtocolCore.h"
 
 #ifndef _HUSKYLENS_H
