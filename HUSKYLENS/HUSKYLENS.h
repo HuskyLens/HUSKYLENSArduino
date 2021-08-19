@@ -372,7 +372,7 @@ public:
     int available()
     {
         int result = count();
-        currentIndex = min(currentIndex, result);
+        currentIndex = min((int)currentIndex, result);
         return result - currentIndex;
     }
 
