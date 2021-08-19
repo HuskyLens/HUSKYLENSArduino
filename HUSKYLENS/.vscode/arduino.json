@@ -1,5 +1,0 @@
-{
-    "board": "arduino:avr:leonardo",
-    "sketch": "examples/HUSKYLENS_OBJECT_TRACKING/HUSKYLENS_OBJECT_TRACKING.ino",
-    "port": "/dev/cu.usbmodem2301"
-}
