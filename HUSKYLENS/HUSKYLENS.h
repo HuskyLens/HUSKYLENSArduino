@@ -228,7 +228,7 @@ private:
         if (!wait(COMMAND_RETURN_INFO))
             return false;
         protocolReadReturnInfo(protocolInfo);
-        protocolPtr = (Protocol_t *)realloc(protocolPtr, max(protocolInfo.protocolSize, 1) * sizeof(Protocol_t));
+        protocolPtr = (Protocol_t *)realloc(protocolPtr, max((int)protocolInfo.protocolSize, 1) * sizeof(Protocol_t));
 
         for (int i = 0; i < protocolInfo.protocolSize; i++)
         {
