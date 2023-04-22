@@ -703,7 +703,8 @@ public:
     {
         Protocol_t protocol;
         uint8_t length = version.length();
-        uint8_t data[length + 2] = {length};
+        uint8_t data[length + 2];
+        data[0]=length;
         version.toCharArray((char *)data + 1, length + 1);
         protocol.firmwareVersion.length = length + 1;
         protocol.firmwareVersion.data = data;
